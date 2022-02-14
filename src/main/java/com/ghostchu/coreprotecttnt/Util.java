@@ -1,4 +1,4 @@
-package com.mcsunnyside.coreprotecttnt;
+package com.ghostchu.coreprotecttnt;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;

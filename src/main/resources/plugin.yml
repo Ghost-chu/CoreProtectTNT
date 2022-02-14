@@ -1,6 +1,6 @@
 name: CoreProtectTNT
-main: com.mcsunnyside.coreprotecttnt.Main
-version: 1.0
+main: com.ghostchu.coreprotecttnt.Main
+version: ${version}
 api-version: 1.16
 depend:
   - CoreProtect

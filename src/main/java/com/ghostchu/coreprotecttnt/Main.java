@@ -1,4 +1,4 @@
-package com.mcsunnyside.coreprotecttnt;
+package com.ghostchu.coreprotecttnt;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;

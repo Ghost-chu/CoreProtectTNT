@@ -2,22 +2,22 @@ block-explosion:
   # Should we log and trace this type of explosion?
   enable: true
   # Cancel the explosion if its source can't be tracked.
-  disable-unknown: true
+  disable-unknown: false
   # The message that will be broadcast to players.
   alert: "&cAn explosion near you has been blocked because it was caused by an unknown object."
 entity-explosion:
   enable: true
-  disable-unknown: true
+  disable-unknown: false
   alert: "&cAn explosion near you has been blocked because that caused by unknown object."
 fire:
-  enable: true
-  disable-unknown: true
+  enable: false
+  disable-unknown: false
   alert: "&cAn fire spreading/burning has been blocked because that caused by unknown object."
 itemframe:
   enable: true
-  disable-unknown: true
+  disable-unknown: false
   alert: "&cBlocked item-frame destroy because that caused by unknown object."
 hanging:
   enable: true
-  disable-unknown: true
+  disable-unknown: false
   alert: "&cBlocked hanging destroy because that caused by unknown object."

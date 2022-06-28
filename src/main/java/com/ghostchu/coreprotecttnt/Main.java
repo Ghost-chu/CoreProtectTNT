@@ -61,8 +61,7 @@ public class Main extends JavaPlugin implements Listener {
             return;
         Block clickedBlock = e.getClickedBlock();
         Location locationHead = clickedBlock.getLocation();
-        if (clickedBlock.getBlockData() instanceof Bed) {
-            Bed bed = (Bed) clickedBlock.getBlockData();
+        if (clickedBlock.getBlockData() instanceof Bed bed) {
             Location locationFoot = locationHead.clone().subtract(bed.getFacing().getDirection());
             if (bed.getPart() == Bed.Part.FOOT) {
                 locationHead.add(bed.getFacing().getDirection());
@@ -122,12 +121,11 @@ public class Main extends JavaPlugin implements Listener {
     // Player item put into ItemFrame / Rotate ItemFrame (logger)
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onClickItemFrame(PlayerInteractEntityEvent e) { // Add item to item-frame or rotating
-        if (!(e.getRightClicked() instanceof ItemFrame))
+        if (!(e.getRightClicked() instanceof ItemFrame itemFrame))
             return;
         ConfigurationSection section = Util.bakeConfigSection(getConfig(), "itemframe");
         if (!section.getBoolean("enable", true))
             return;
-        ItemFrame itemFrame = (ItemFrame) e.getRightClicked();
         // Player interacted itemframe
         api.logInteraction(e.getPlayer().getName(), e.getRightClicked().getLocation());
         // Check item I/O
@@ -178,14 +176,14 @@ public class Main extends JavaPlugin implements Listener {
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onIgniteTNT(EntitySpawnEvent e) {
         Entity tnt = e.getEntity();
-        if (!(e.getEntity() instanceof TNTPrimed))
+        if (!(e.getEntity() instanceof TNTPrimed tntPrimed))
             return;
-        TNTPrimed tntPrimed = (TNTPrimed) e.getEntity();
         Entity source = tntPrimed.getSource();
         if (source != null) {
             //Bukkit has given the ignition source, track it directly.
-            if (probablyCache.getIfPresent(source) != null) {
-                probablyCache.put(tnt, probablyCache.getIfPresent(source));
+            String sourceFromCache = probablyCache.getIfPresent(source);
+            if (sourceFromCache != null) {
+                probablyCache.put(tnt, sourceFromCache);
             }
             if (source.getType() == EntityType.PLAYER) {
                 probablyCache.put(tntPrimed, source.getName());
@@ -194,8 +192,7 @@ public class Main extends JavaPlugin implements Listener {
         }
         Location blockCorner = tnt.getLocation().clone().subtract(0.5, 0, 0.5);
         for (Map.Entry<Object, String> entry : probablyCache.asMap().entrySet()) {
-            if (entry.getKey() instanceof Location) {
-                Location loc = (Location) entry.getKey();
+            if (entry.getKey() instanceof Location loc) {
                 if (loc.getWorld().equals(blockCorner.getWorld()) && loc.distance(blockCorner) < 0.5) {
                     probablyCache.put(tnt, entry.getValue());
                     break;
@@ -228,10 +225,10 @@ public class Main extends JavaPlugin implements Listener {
         if (e.getDamager() instanceof Player) {
             probablyCache.put(e.getEntity(), e.getDamager().getName());
         } else {
-            if (probablyCache.getIfPresent(e.getDamager()) != null) {
-                probablyCache.put(e.getEntity(), probablyCache.getIfPresent(e.getDamager()));
-            } else if (e.getDamager() instanceof Projectile) {
-                Projectile projectile = (Projectile) e.getDamager();
+            String sourceFromCache = probablyCache.getIfPresent(e.getDamager());
+            if (sourceFromCache != null) {
+                probablyCache.put(e.getEntity(), sourceFromCache);
+            } else if (e.getDamager() instanceof Projectile projectile) {
                 if (projectile.getShooter() != null && projectile.getShooter() instanceof Player) {
                     probablyCache.put(e.getEntity(), ((Player) projectile.getShooter()).getName());
                 }
@@ -296,18 +293,17 @@ public class Main extends JavaPlugin implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
     public void onEntityHitByProjectile(EntityDamageByEntityEvent e) {
-       if (e.getDamager() instanceof Projectile) {
-           Projectile projectile = (Projectile)e.getDamager();
-           if(projectile.getShooter() instanceof Player){
-               probablyCache.put(e.getEntity(),((Player) projectile.getShooter()).getName());
-               return;
-           }
+        if (e.getDamager() instanceof Projectile projectile) {
+            if (projectile.getShooter() instanceof Player) {
+                probablyCache.put(e.getEntity(), ((Player) projectile.getShooter()).getName());
+                return;
+            }
             String reason = probablyCache.getIfPresent(e.getDamager());
             if (reason != null) {
-               probablyCache.put(e.getEntity(),reason);
-               return;
+                probablyCache.put(e.getEntity(), reason);
+                return;
             }
-            probablyCache.put(e.getEntity(),e.getDamager().getName());
+            probablyCache.put(e.getEntity(), e.getDamager().getName());
         }
     }
 
@@ -319,8 +315,9 @@ public class Main extends JavaPlugin implements Listener {
                 // Don't add it to probablyIgnitedThisTick because it's the simplest case and is logged by Core Protect
                 return;
             }
-            if (probablyCache.getIfPresent(e.getIgnitingEntity()) != null) {
-                probablyCache.put(e.getBlock().getLocation(), probablyCache.getIfPresent(e.getIgnitingEntity()));
+            String sourceFromCache = probablyCache.getIfPresent(e.getIgnitingEntity());
+            if (sourceFromCache != null) {
+                probablyCache.put(e.getBlock().getLocation(), sourceFromCache);
                 return;
             } else if (e.getIgnitingEntity() instanceof Projectile) {
                 if (((Projectile) e.getIgnitingEntity()).getShooter() != null) {
@@ -333,8 +330,9 @@ public class Main extends JavaPlugin implements Listener {
             }
         }
         if (e.getIgnitingBlock() != null) {
-            if (probablyCache.getIfPresent(e.getIgnitingBlock().getLocation()) != null) {
-                probablyCache.put(e.getBlock().getLocation(), probablyCache.getIfPresent(e.getIgnitingBlock().getLocation()));
+            String sourceFromCache = probablyCache.getIfPresent(e.getIgnitingBlock().getLocation());
+            if (sourceFromCache != null) {
+                probablyCache.put(e.getBlock().getLocation(), sourceFromCache);
                 return;
             }
         }
@@ -351,8 +349,9 @@ public class Main extends JavaPlugin implements Listener {
         if (!section.getBoolean("enable", true))
             return;
         if (e.getIgnitingBlock() != null) {
-            if (probablyCache.getIfPresent(e.getIgnitingBlock().getLocation()) != null) {
-                probablyCache.put(e.getBlock().getLocation(), probablyCache.getIfPresent(e.getIgnitingBlock().getLocation()));
+            String sourceFromCache = probablyCache.getIfPresent(e.getIgnitingBlock().getLocation());
+            if (sourceFromCache != null) {
+                probablyCache.put(e.getBlock().getLocation(), sourceFromCache);
                 api.logRemoval("#fire-" + probablyCache.getIfPresent(e.getIgnitingBlock().getLocation()), e.getBlock().getLocation(), e.getBlock().getType(), e.getBlock().getBlockData());
             } else if (section.getBoolean("disable-unknown", true)) {
                 e.setCancelled(true);
@@ -365,11 +364,14 @@ public class Main extends JavaPlugin implements Listener {
     public void onBombHit(ProjectileHitEvent e) {
         if (e.getHitEntity() instanceof ExplosiveMinecart || e.getEntityType() == EntityType.ENDER_CRYSTAL) {
             if (e.getEntity().getShooter() != null && e.getEntity().getShooter() instanceof Player) {
-                if (probablyCache.getIfPresent(e.getEntity()) != null) {
-                    probablyCache.put(e.getHitEntity(), probablyCache.getIfPresent(e.getEntity()));
-                } else {
-                    if (e.getEntity().getShooter() != null && e.getEntity().getShooter() instanceof Player) {
-                        probablyCache.put(e.getHitEntity(), ((Player) e.getEntity().getShooter()).getName());
+                if (e.getHitEntity() != null) {
+                    String sourceFromCache = probablyCache.getIfPresent(e.getEntity());
+                    if (sourceFromCache != null) {
+                        probablyCache.put(e.getHitEntity(), sourceFromCache);
+                    } else {
+                        if (e.getEntity().getShooter() != null && e.getEntity().getShooter() instanceof Player) {
+                            probablyCache.put(e.getHitEntity(), ((Player) e.getEntity().getShooter()).getName());
+                        }
                     }
                 }
             }
@@ -458,8 +460,7 @@ public class Main extends JavaPlugin implements Listener {
             boolean isLogged = false;
             Location blockCorner = entity.getLocation().clone().subtract(0.5, 0, 0.5);
             for (Map.Entry<Object, String> entry : probablyCache.asMap().entrySet()) {
-                if (entry.getKey() instanceof Location) {
-                    Location loc = (Location) entry.getKey();
+                if (entry.getKey() instanceof Location loc) {
                     if (loc.getWorld().equals(blockCorner.getWorld()) && loc.distance(blockCorner) < 1) {
                         for (Block block : blockList) {
                             api.logRemoval("#tntminecart-" + entry.getValue(), block.getLocation(), block.getType(), block.getBlockData());

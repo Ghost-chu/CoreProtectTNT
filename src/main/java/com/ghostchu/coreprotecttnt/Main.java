@@ -160,16 +160,15 @@ public class Main extends JavaPlugin implements Listener {
             } else {
                 source += ((Entity) projectileSource).getName();
             }
-            probablyCache.put(projectileSource, source);
         } else {
             if (projectileSource instanceof Block) {
                 source += ((Block) projectileSource).getType().name();
-                probablyCache.put(((Block) projectileSource).getLocation(), source);
             } else {
                 source += projectileSource.getClass().getName();
-                probablyCache.put(projectileSource, source);
             }
         }
+        probablyCache.put(e.getEntity(), source);
+        probablyCache.put(projectileSource, source);
     }
 
     // TNT ignites by Player (listener)

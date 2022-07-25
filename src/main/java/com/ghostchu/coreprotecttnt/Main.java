@@ -338,7 +338,7 @@ public class Main extends JavaPlugin implements Listener {
         ConfigurationSection section = Util.bakeConfigSection(getConfig(), "fire");
         if (!section.getBoolean("enable", true))
             return;
-        if (!section.getBoolean("disable-unknown", true))
+        if (section.getBoolean("disable-unknown", true))
             e.setCancelled(true);
     }
 

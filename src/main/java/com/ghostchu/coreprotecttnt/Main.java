@@ -33,7 +33,6 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class Main extends JavaPlugin implements Listener {
-    private CoreProtectAPI api;
     private final Cache<Object, String> probablyCache = CacheBuilder
             .newBuilder()
             .expireAfterAccess(1, TimeUnit.HOURS)
@@ -41,6 +40,7 @@ public class Main extends JavaPlugin implements Listener {
             .maximumSize(50000) // Drop objects if too much, because it will cost expensive lookup.
             .recordStats()
             .build();
+    private CoreProtectAPI api;
 
     @Override
     public void onEnable() {
@@ -212,7 +212,12 @@ public class Main extends JavaPlugin implements Listener {
         Block hangingPosBlock = e.getEntity().getLocation().getBlock();
         String reason = probablyCache.getIfPresent(hangingPosBlock.getLocation());
         if (reason != null) {
-            api.logRemoval("#" + e.getCause().name() + "-" + reason, hangingPosBlock.getLocation(), Material.matchMaterial(e.getEntity().getType().name()), null);
+            Material mat = Material.matchMaterial(e.getEntity().getType().name());
+            if (mat != null) {
+                api.logRemoval("#" + e.getCause().name() + "-" + reason, hangingPosBlock.getLocation(), Material.matchMaterial(e.getEntity().getType().name()), null);
+            } else {
+                api.logInteraction("#" + e.getCause().name() + "-" + reason, hangingPosBlock.getLocation());
+            }
         }
     }
 

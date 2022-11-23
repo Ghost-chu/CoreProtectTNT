@@ -40,6 +40,9 @@ jobs:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         github-draft: false
         
+        curseforge-id: 709850
+        curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+        
         files-primary: target/!(*-@(dev|sources|javadoc)).jar
         files-secondary: target/*-@(dev|sources|javadoc).jar
         loaders: |

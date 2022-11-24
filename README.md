@@ -1,4 +1,4 @@
 # CoreProtectTNT
-CoreProtect addon allow you log the tnt and creeper explosion souce
+A CoreProtect addon allow you log the TNT (or TNTMinecart), Creeper, Ghast, Bed and even ItemFrame breaks!
 
-https://www.spigotmc.org/resources/69609
+[Modrinth](https://modrinth.com/plugin/coreprotecttnt)

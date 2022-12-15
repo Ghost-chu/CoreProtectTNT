@@ -35,7 +35,9 @@ jobs:
         modrinth-id: DnMaciap
         modrinth-featured: true
         modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
-  
+        modrinth-dependencies: |
+          Lu3KuzdV | required | *
+
         github-discussion: Announcements
         github-token: ${{ secrets.GITHUB_TOKEN }}
         github-draft: false
